@@ -1,19 +1,41 @@
 import {useEffect, useState} from 'react'
 import {Api, Image as ImageInfo, Metadata} from "./Api.js";
-import {AppShell, Center, Flex, Footer, Header, Image, Pagination, Text} from "@mantine/core";
+import {
+  AppShell,
+  Box,
+  Center,
+  Flex,
+  Footer,
+  Grid,
+  Header,
+  Image,
+  Modal,
+  Pagination,
+  ScrollArea,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+  UnstyledButton
+} from "@mantine/core";
 
+function additionalParams(k: string) {
+  return k != "id" && k != "prompt" && k != "negative-prompt" && k != "creation-time" && k != "checkpoint"
+}
 
 function App() {
   const [images, setImages] = useState<ImageInfo[]>([])
+  const [image, setImage] = useState<ImageInfo | null>(null)
   const [metadata, setMetadata] = useState<Metadata | null>(null)
   const [page, setPage] = useState(1)
+  const [query, setQuery] = useState("")
 
   const api = new Api()
   const getURL = (id: string) => `${api.baseUrl}/${encodeURIComponent(id)}`
 
   useEffect(() => {
     const fetchImages = async () => {
-      const res = await api.getImages({page: page-1})
+      const res = await api.getImages({page: page - 1})
       if (res.data.items) {
         setImages(res.data.items)
       }
@@ -24,9 +46,11 @@ function App() {
 
   const header = (
     <Header height={{base: 50, md: 70}} p="md" fixed>
-      <div style={{display: 'flex', alignItems: 'center', height: '100%'}}>
-        <Text>Application header</Text>
-      </div>
+      <Flex justify="space-between">
+        <Text>SD Image Viewer</Text>
+        <TextInput placeholder="Search keywords" value={query}
+                   onChange={(event) => setQuery(event.currentTarget.value)}/>
+      </Flex>
     </Header>
   )
   const footer = (
@@ -38,13 +62,59 @@ function App() {
   )
   const imageList = (
     images.map((image) => (
-      <Image key={image.id} src={getURL(image.id)} alt={image.prompt} radius="md" width={512} height={768}
-             fit="contain" withPlaceholder/>
+      <UnstyledButton key={image.id} onClick={() => setImage(image)}>
+        <Image src={getURL(image.id)} alt={image.prompt} radius="md" width={512 / 2} height={768 / 2}
+               fit="contain" withPlaceholder/>
+      </UnstyledButton>
     ))
   )
+  let modal
+  if (image) {
+    const params = Object.keys(image).filter(additionalParams).map(k => (
+      <Box key={k}><Title order={4}>{k}: </Title><Text>{image[k]}</Text></Box>
+    ))
+    modal = (
+      <Modal opened={true} onClose={() => setImage(null)} fullScreen>
+        <Grid justify="center" align="center">
+          <Grid.Col span={8}>
+            <Image src={getURL(image.id)} alt={image.prompt} radius="md" fit="contain" withPlaceholder width="65vw"
+                   height="90vh"/>
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Stack>
+              <Box>
+                <Title order={3}>Prompt:</Title>
+                <Text>{image.prompt}</Text>
+              </Box>
+              <Box>
+                <Title order={3}>Negative Prompt:</Title>
+                <Text>{image["negative-prompt"]}</Text>
+              </Box>
+              <Box>
+                <Title order={3}>Checkpoint:</Title>
+                <Text>{image.checkpoint}</Text>
+              </Box>
+              <Box>
+                <Title order={3}>Creation Date:</Title>
+                <Text>{image["creation-time"]}</Text>
+              </Box>
+              <Box>
+                <ScrollArea h={250}>
+                  <Stack>
+                    {params}
+                  </Stack>
+                </ScrollArea>
+              </Box>
+            </Stack>
+          </Grid.Col>
+        </Grid>
+      </Modal>
+    )
+  }
 
   return (
     <AppShell padding="md" header={header} footer={footer}>
+      {modal}
       <Flex wrap="wrap" justify="center" gap={{base: 'sm', sm: 'lg'}}>
         {imageList}
       </Flex>
