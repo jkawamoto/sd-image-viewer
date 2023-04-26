@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"log"
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/jkawamoto/sd-image-viewer/server"
@@ -50,9 +52,18 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-
-		if err := indexDir(ctx, dir, index, *force, logger); err != nil {
-			logger.Printf("failed to index files in %v: %v", dir, err)
+		for {
+			err := indexDir(ctx, dir, index, *force, logger)
+			if errors.Is(err, context.Canceled) {
+				break
+			} else if err != nil {
+				logger.Printf("failed to index files in %v: %v", dir, err)
+			}
+			select {
+			case <-ctx.Done():
+				break
+			case <-time.After(1 * time.Hour):
+			}
 		}
 	}()
 
