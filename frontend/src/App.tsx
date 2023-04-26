@@ -10,6 +10,7 @@ import {
   Modal,
   Pagination,
   SegmentedControl,
+  Slider,
   UnstyledButton
 } from "@mantine/core";
 import Query from "./Query.tsx";
@@ -29,6 +30,7 @@ function App() {
   const [size, setSize] = useState("")
   const [order, setOrder] = useState("desc")
   const [date, setDate] = useState<Date | null>(null);
+  const [thumbSize, setThumbSize] = useState(2)
 
   const api = new Api()
   const getURL = (id: string) => `${api.baseUrl}/${encodeURIComponent(id)}`
@@ -43,7 +45,7 @@ function App() {
         order: order === "asc" ? order : "desc",
         after: d.toJSON() || undefined,
         before: d.day(d.day() + 1).toJSON() || undefined,
-        limit: 12/2*5
+        limit: 12 / thumbSize * 5
       })
       if (res.data.items) {
         setImages(res.data.items)
@@ -51,7 +53,7 @@ function App() {
       setMetadata(res.data.metadata || null)
     }
     fetchImages().catch(console.error)
-  }, [page, query, size, order, date])
+  }, [page, query, size, order, date, thumbSize])
 
   const header = (
     <Header height={{base: 50, md: 70}} p="md" fixed>
@@ -64,6 +66,22 @@ function App() {
               {label: 'Newest', value: 'desc'},
               {label: 'Oldest', value: 'asc'},
             ]}
+          />
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <Slider
+            min={1}
+            max={4}
+            step={1}
+            marks={[
+              {value: 1, label: 'XS'},
+              {value: 2, label: 'S'},
+              {value: 3, label: 'M'},
+              {value: 4, label: 'L'},
+            ]}
+            styles={{markLabel: {display: 'none'}}}
+            onChange={setThumbSize}
+            color="violet"
           />
         </Grid.Col>
         <Grid.Col span="auto">
@@ -101,7 +119,7 @@ function App() {
   )
   const imageList = (
     images.map((image, index) => (
-      <Grid.Col span={2} key={image.id}>
+      <Grid.Col span={thumbSize} key={image.id}>
         <UnstyledButton onClick={() => setSelectedImage(index)}>
           <Image src={getURL(image.id)} alt={image.prompt} radius="md" fit="scale-down" withPlaceholder/>
         </UnstyledButton>
