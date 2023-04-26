@@ -4,7 +4,6 @@ import {
   AppShell,
   Box,
   Center,
-  Flex,
   Footer,
   Grid,
   Header,
@@ -12,10 +11,11 @@ import {
   Modal,
   Pagination,
   ScrollArea,
+  SegmentedControl,
   Stack,
   Text,
   Title,
-  UnstyledButton, SegmentedControl
+  UnstyledButton
 } from "@mantine/core";
 import Query from "./Query.tsx";
 
@@ -42,7 +42,7 @@ function App() {
         query,
         page: page - 1,
         size: size === "small" || size === "medium" || size === "large" ? size : undefined,
-        order: order === "asc" ? order: "desc",
+        order: order === "asc" ? order : "desc",
       })
       if (res.data.items) {
         setImages(res.data.items)
@@ -54,43 +54,49 @@ function App() {
 
   const header = (
     <Header height={{base: 50, md: 70}} p="md" fixed>
-      <Flex justify="space-between">
-        <Text>SD Image Viewer</Text>
-        <Query onSearch={setQuery}/>
-        <SegmentedControl
-          value={size}
-          onChange={setSize}
-          data={[
-            {label: 'All', value: ''},
-            {label: 'Small', value: 'small'},
-            {label: 'Medium', value: 'medium'},
-            {label: 'Large', value: 'large'},
-          ]}
-        />
-        <SegmentedControl
-          value={order}
-          onChange={setOrder}
-          data={[
-            {label: 'Newest', value: 'desc'},
-            {label: 'Oldest', value: 'asc'},
-          ]}
-        />
-      </Flex>
+      <Grid align="baseline">
+        <Grid.Col span="content">
+          <SegmentedControl
+            value={order}
+            onChange={setOrder}
+            data={[
+              {label: 'Newest', value: 'desc'},
+              {label: 'Oldest', value: 'asc'},
+            ]}
+          />
+        </Grid.Col>
+        <Grid.Col span="auto">
+          <Query onSearch={setQuery}/>
+        </Grid.Col>
+        <Grid.Col span="content">
+          <SegmentedControl
+            value={size}
+            onChange={setSize}
+            data={[
+              {label: 'All', value: ''},
+              {label: 'Small', value: 'small'},
+              {label: 'Medium', value: 'medium'},
+              {label: 'Large', value: 'large'},
+            ]}
+          />
+        </Grid.Col>
+      </Grid>
     </Header>
   )
   const footer = (
     <Footer height={{base: 30, md: 50}} fixed>
-      <Center>
+      <Center mt="0.5em">
         <Pagination total={metadata?.totalPages || 0} onChange={setPage}/>
       </Center>
     </Footer>
   )
   const imageList = (
     images.map((image) => (
-      <UnstyledButton key={image.id} onClick={() => setImage(image)}>
-        <Image src={getURL(image.id)} alt={image.prompt} radius="md" width={512 / 2} height={768 / 2}
-               fit="contain" withPlaceholder/>
-      </UnstyledButton>
+      <Grid.Col span={2}>
+        <UnstyledButton key={image.id} onClick={() => setImage(image)}>
+          <Image src={getURL(image.id)} alt={image.prompt} radius="md" fit="contain" withPlaceholder/>
+        </UnstyledButton>
+      </Grid.Col>
     ))
   )
   let modal
@@ -140,9 +146,9 @@ function App() {
   return (
     <AppShell padding="md" header={header} footer={footer}>
       {modal}
-      <Flex wrap="wrap" justify="center" gap={{base: 'sm', sm: 'lg'}}>
+      <Grid justify="flex-start">
         {imageList}
-      </Flex>
+      </Grid>
     </AppShell>
   )
 }
