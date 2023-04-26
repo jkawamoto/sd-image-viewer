@@ -27,6 +27,7 @@ func main() {
 
 	indexPath := flag.String("index", filepath.Join(cacheDir, AppName), "path to the index")
 	force := flag.Bool("force", false, "force reindexing all images")
+	prune := flag.Bool("prune", false, "remove non exiting images from the index")
 
 	flag.Parse()
 	if flag.NArg() == 0 {
@@ -52,6 +53,14 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		if *prune {
+			err := pruneIndex(ctx, index, logger)
+			if errors.Is(err, context.Canceled) {
+				return
+			} else if err != nil {
+				logger.Printf("failed to prune index: %v", err)
+			}
+		}
 		for {
 			err := indexDir(ctx, dir, index, *force, logger)
 			if errors.Is(err, context.Canceled) {

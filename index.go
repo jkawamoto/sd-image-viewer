@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/blevesearch/bleve/v2"
+	"github.com/blevesearch/bleve/v2/search/query"
 	"github.com/jkawamoto/sd-image-viewer/image"
 )
 
@@ -90,4 +92,41 @@ func indexDir(ctx context.Context, dir string, index bleve.Index, force bool, lo
 
 		return nil
 	})
+}
+
+func pruneIndex(ctx context.Context, index bleve.Index, logger *log.Logger) error {
+	size := 100
+	from := 0
+
+	logger.Println("pruning index")
+	for {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+
+		res, err := index.Search(bleve.NewSearchRequestOptions(query.NewMatchAllQuery(), size, from, false))
+		if err != nil {
+			return err
+		}
+		if len(res.Hits) == 0 {
+			logger.Println("finished pruning index")
+			return nil
+		}
+		from += size
+
+		b := index.NewBatch()
+		for _, v := range res.Hits {
+			_, err = os.Stat(v.ID)
+			if os.IsNotExist(err) {
+				logger.Printf("removing %v from index", v.ID)
+				b.Delete(v.ID)
+				from--
+			} else if err != nil {
+				logger.Printf("failed to stat a file: %v", err)
+			}
+		}
+		if err = index.Batch(b); err != nil {
+			return fmt.Errorf("failed to remove items: %w", err)
+		}
+	}
 }
