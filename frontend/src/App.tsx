@@ -14,14 +14,15 @@ import {
   ScrollArea,
   Stack,
   Text,
-  TextInput,
   Title,
   UnstyledButton
 } from "@mantine/core";
+import Query from "./Query.tsx";
 
 function additionalParams(k: string) {
   return k != "id" && k != "prompt" && k != "negative-prompt" && k != "creation-time" && k != "checkpoint"
 }
+
 
 function App() {
   const [images, setImages] = useState<ImageInfo[]>([])
@@ -35,21 +36,20 @@ function App() {
 
   useEffect(() => {
     const fetchImages = async () => {
-      const res = await api.getImages({page: page - 1})
+      const res = await api.getImages({query, page: page - 1})
       if (res.data.items) {
         setImages(res.data.items)
       }
       setMetadata(res.data.metadata || null)
     }
     fetchImages().catch(console.error)
-  }, [page])
+  }, [page, query])
 
   const header = (
     <Header height={{base: 50, md: 70}} p="md" fixed>
       <Flex justify="space-between">
         <Text>SD Image Viewer</Text>
-        <TextInput placeholder="Search keywords" value={query}
-                   onChange={(event) => setQuery(event.currentTarget.value)}/>
+        <Query onSearch={setQuery}/>
       </Flex>
     </Header>
   )
