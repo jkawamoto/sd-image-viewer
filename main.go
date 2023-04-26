@@ -2,33 +2,46 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
-	"os"
+	"sync"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/jkawamoto/sd-image-viewer/server"
 )
 
 func main() {
-	ctx := context.Background()
 	logger := log.Default()
-
-	if len(os.Args) == 1 {
-		logger.Fatalln("one directory path is required")
-	}
-
 	bleve.SetLog(logger)
 
-	index, err := newIndex(".bleve")
+	indexPath := flag.String("index", ".bleve", "path to the index")
+	force := flag.Bool("force", false, "force reindexing all images")
+
+	flag.Parse()
+	if flag.NArg() == 0 {
+		logger.Fatalln("one directory path is required")
+	}
+	dir := flag.Arg(0)
+
+	index, err := newIndex(*indexPath)
 	if err != nil {
 		logger.Fatalf("failed to create an index: %v", err)
 	}
 
-	dir := os.Args[1]
-	err = indexDir(ctx, dir, index, false, logger)
-	if err != nil {
-		logger.Fatalf("failed to read files in %v: %v", os.Args[1], err)
-	}
+	var wg sync.WaitGroup
+	defer wg.Wait()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		if err := indexDir(ctx, dir, index, *force, logger); err != nil {
+			logger.Printf("failed to index files in %v: %v", dir, err)
+		}
+	}()
 
 	s, err := server.NewServer(index, dir, logger)
 	if err != nil {
