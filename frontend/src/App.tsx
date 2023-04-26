@@ -31,6 +31,7 @@ function App() {
   const [page, setPage] = useState(1)
   const [query, setQuery] = useState("")
   const [size, setSize] = useState("")
+  const [order, setOrder] = useState("desc")
 
   const api = new Api()
   const getURL = (id: string) => `${api.baseUrl}/${encodeURIComponent(id)}`
@@ -41,6 +42,7 @@ function App() {
         query,
         page: page - 1,
         size: size === "small" || size === "medium" || size === "large" ? size : undefined,
+        order: order === "asc" ? order: "desc",
       })
       if (res.data.items) {
         setImages(res.data.items)
@@ -48,7 +50,7 @@ function App() {
       setMetadata(res.data.metadata || null)
     }
     fetchImages().catch(console.error)
-  }, [page, query, size])
+  }, [page, query, size, order])
 
   const header = (
     <Header height={{base: 50, md: 70}} p="md" fixed>
@@ -63,6 +65,14 @@ function App() {
             {label: 'Small', value: 'small'},
             {label: 'Medium', value: 'medium'},
             {label: 'Large', value: 'large'},
+          ]}
+        />
+        <SegmentedControl
+          value={order}
+          onChange={setOrder}
+          data={[
+            {label: 'Newest', value: 'desc'},
+            {label: 'Oldest', value: 'asc'},
           ]}
         />
       </Flex>
