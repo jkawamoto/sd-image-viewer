@@ -1,5 +1,9 @@
 import {Box, Grid, Image, ScrollArea, Stack, Text, Title} from "@mantine/core";
 import {Image as ImageInfo} from "./Api.js";
+import  dayjs from "dayjs";
+import utc from "dayjs/plugin/utc"
+
+dayjs.extend(utc)
 
 function additionalParams(k: string) {
   return k != "id" && k != "prompt" && k != "negative-prompt" && k != "creation-time" && k != "checkpoint"
@@ -40,7 +44,7 @@ function ImageDetail({url, image}: Props) {
           </Box>
           <Box>
             <Title order={3}>Creation Date:</Title>
-            <Text style={{wordBreak: "break-all"}}>{image["creation-time"]}</Text>
+            <Text style={{wordBreak: "break-all"}}>{dayjs(image["creation-time"]).local().toString()}</Text>
           </Box>
           <Box>
             <ScrollArea h={250}>

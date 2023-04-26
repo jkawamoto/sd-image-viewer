@@ -15,6 +15,8 @@ import {
 import Query from "./Query.tsx";
 import ImageDetail from "./ImageDetail.tsx";
 import {Carousel, Embla, useAnimationOffsetEffect} from "@mantine/carousel";
+import {DatePickerInput} from '@mantine/dates';
+import dayjs from "dayjs";
 
 const TRANSITION_DURATION = 200;
 
@@ -26,17 +28,22 @@ function App() {
   const [query, setQuery] = useState("")
   const [size, setSize] = useState("")
   const [order, setOrder] = useState("desc")
+  const [date, setDate] = useState<Date | null>(null);
 
   const api = new Api()
   const getURL = (id: string) => `${api.baseUrl}/${encodeURIComponent(id)}`
 
   useEffect(() => {
     const fetchImages = async () => {
+      const d = dayjs(date).startOf("day")
       const res = await api.getImages({
         query,
         page: page - 1,
         size: size === "small" || size === "medium" || size === "large" ? size : undefined,
         order: order === "asc" ? order : "desc",
+        after: d.toJSON() || undefined,
+        before: d.day(d.day() + 1).toJSON() || undefined,
+        limit: 12/2*5
       })
       if (res.data.items) {
         setImages(res.data.items)
@@ -44,7 +51,7 @@ function App() {
       setMetadata(res.data.metadata || null)
     }
     fetchImages().catch(console.error)
-  }, [page, query, size, order])
+  }, [page, query, size, order, date])
 
   const header = (
     <Header height={{base: 50, md: 70}} p="md" fixed>
@@ -61,6 +68,14 @@ function App() {
         </Grid.Col>
         <Grid.Col span="auto">
           <Query onSearch={setQuery}/>
+        </Grid.Col>
+        <Grid.Col span="content">
+          <DatePickerInput
+            onChange={setDate}
+            clearable
+            placeholder="Filter by date"
+            miw="12em"
+          />
         </Grid.Col>
         <Grid.Col span="content">
           <SegmentedControl

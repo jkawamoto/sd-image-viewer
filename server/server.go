@@ -128,7 +128,7 @@ func GetImagesHandler(index bleve.Index, pathPrefix string, logger *log.Logger) 
 			if params.After != nil {
 				after = time.Time(*params.After)
 			}
-			q := query.NewDateRangeQuery(after, before)
+			q := query.NewDateRangeInclusiveQuery(after, before, swag.Bool(true), swag.Bool(false))
 			q.FieldVal = "creation-time"
 
 			queries = append(queries, q)
