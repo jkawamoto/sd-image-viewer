@@ -536,6 +536,13 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@mantine/carousel@^6.0.9":
+  version "6.0.9"
+  resolved "https://registry.yarnpkg.com/@mantine/carousel/-/carousel-6.0.9.tgz#c43e272b50d5145e180fdddf4507b9855ed25899"
+  integrity sha512-2ULOcgs4M9ar00QJqP0rKbM61Cy4UmGsQzcHwyKPsQOaAhrZ/XZMJHx3CwlXTtrDo0DNXAYtOwV73Fu5Dnn7lQ==
+  dependencies:
+    "@mantine/utils" "6.0.9"
+
 "@mantine/core@^6.0.8":
   version "6.0.8"
   resolved "https://registry.yarnpkg.com/@mantine/core/-/core-6.0.8.tgz#f962e0ab1d24caaa03d4e6b07ba615655fd48e3d"
@@ -565,6 +572,11 @@
   version "6.0.8"
   resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-6.0.8.tgz#3e77f7ae7ab6c06555a619e137fc62942d95c109"
   integrity sha512-G7omM5XjnGzXLiFU/r2yOJrixDFnY2pUkqD38cV9e/Qa6KFEErp4mNb+rhkSHafCnvfwBiNcdryZwEhJTtuC+Q==
+
+"@mantine/utils@6.0.9":
+  version "6.0.9"
+  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-6.0.9.tgz#d6acc689443e99a5a1ea490fbdbc8dee1aa8568d"
+  integrity sha512-zEDZixO8dw2ZSNZiQ1g7S+Bq2q4E8ps6bvpyZsxpiXBdh3g2H0WOEdJdDpBTiTRPWotSlU1kaKN3tOplCRDQ2Q==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -1078,6 +1090,24 @@ electron-to-chromium@^1.4.284:
   version "1.4.369"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.369.tgz#a98d838cdd79be4471cd04e9b4dffe891d037874"
   integrity sha512-LfxbHXdA/S+qyoTEA4EbhxGjrxx7WK2h6yb5K2v0UCOufUKX+VZaHbl3svlzZfv9sGseym/g3Ne4DpsgRULmqg==
+
+embla-carousel-react@^8.0.0-rc01:
+  version "8.0.0-rc01"
+  resolved "https://registry.yarnpkg.com/embla-carousel-react/-/embla-carousel-react-8.0.0-rc01.tgz#5bcb1333c153b16b88e9a91ba4f2638f5c438ed5"
+  integrity sha512-X0v+qqCqoMFmU7U6EDQljl2CcBvLaBMi4DZjDqLI9eH5dlTkwmzFYhNIIFpwC/dvxEv8ly45UT10oKvTecCUfw==
+  dependencies:
+    embla-carousel "8.0.0-rc01"
+    embla-carousel-reactive-utils "8.0.0-rc01"
+
+embla-carousel-reactive-utils@8.0.0-rc01:
+  version "8.0.0-rc01"
+  resolved "https://registry.yarnpkg.com/embla-carousel-reactive-utils/-/embla-carousel-reactive-utils-8.0.0-rc01.tgz#601d374541c1fa77ff782dcd8edbf06ef655fd66"
+  integrity sha512-JUUtLapI5JSUR0vW+DGGJYhqEn+QuDmxpX01B0/5AXMM/UnNlBmFMaKFab8nXeRPtx0d6irkVEBZSWpjmK25DA==
+
+embla-carousel@8.0.0-rc01:
+  version "8.0.0-rc01"
+  resolved "https://registry.yarnpkg.com/embla-carousel/-/embla-carousel-8.0.0-rc01.tgz#11b8a52266f15f737469326c0807878ad36d9b46"
+  integrity sha512-kxP/W5TsDPw974RSAa8Ad39KtiCgOvpqNikuY0ASmC5D5XTVwzcwJpgtlnwq/kxtxLNq5G0s9PdjexTb/xdsqA==
 
 emoji-regex@^8.0.0:
   version "8.0.0"

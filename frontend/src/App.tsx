@@ -2,7 +2,6 @@ import {useEffect, useState} from 'react'
 import {Api, Image as ImageInfo, Metadata} from "./Api.js";
 import {
   AppShell,
-  Box,
   Center,
   Footer,
   Grid,
@@ -10,23 +9,18 @@ import {
   Image,
   Modal,
   Pagination,
-  ScrollArea,
   SegmentedControl,
-  Stack,
-  Text,
-  Title,
   UnstyledButton
 } from "@mantine/core";
 import Query from "./Query.tsx";
+import ImageDetail from "./ImageDetail.tsx";
+import {Carousel, Embla, useAnimationOffsetEffect} from "@mantine/carousel";
 
-function additionalParams(k: string) {
-  return k != "id" && k != "prompt" && k != "negative-prompt" && k != "creation-time" && k != "checkpoint"
-}
-
+const TRANSITION_DURATION = 200;
 
 function App() {
   const [images, setImages] = useState<ImageInfo[]>([])
-  const [image, setImage] = useState<ImageInfo | null>(null)
+  const [selectedImage, setSelectedImage] = useState<number | null>(null)
   const [metadata, setMetadata] = useState<Metadata | null>(null)
   const [page, setPage] = useState(1)
   const [query, setQuery] = useState("")
@@ -91,61 +85,31 @@ function App() {
     </Footer>
   )
   const imageList = (
-    images.map((image) => (
-      <Grid.Col span={2}>
-        <UnstyledButton key={image.id} onClick={() => setImage(image)}>
-          <Image src={getURL(image.id)} alt={image.prompt} radius="md" fit="contain" withPlaceholder/>
+    images.map((image, index) => (
+      <Grid.Col span={2} key={image.id}>
+        <UnstyledButton onClick={() => setSelectedImage(index)}>
+          <Image src={getURL(image.id)} alt={image.prompt} radius="md" fit="scale-down" withPlaceholder/>
         </UnstyledButton>
       </Grid.Col>
     ))
   )
-  let modal
-  if (image) {
-    const params = Object.keys(image).filter(additionalParams).map(k => (
-      <Box key={k}><Title order={4}>{k}: </Title><Text>{image[k]}</Text></Box>
-    ))
-    modal = (
-      <Modal opened={true} onClose={() => setImage(null)} fullScreen>
-        <Grid justify="center" align="center">
-          <Grid.Col span={8}>
-            <Image src={getURL(image.id)} alt={image.prompt} radius="md" fit="contain" withPlaceholder width="65vw"
-                   height="90vh"/>
-          </Grid.Col>
-          <Grid.Col span={4}>
-            <Stack>
-              <Box>
-                <Title order={3}>Prompt:</Title>
-                <Text>{image.prompt}</Text>
-              </Box>
-              <Box>
-                <Title order={3}>Negative Prompt:</Title>
-                <Text>{image["negative-prompt"]}</Text>
-              </Box>
-              <Box>
-                <Title order={3}>Checkpoint:</Title>
-                <Text>{image.checkpoint}</Text>
-              </Box>
-              <Box>
-                <Title order={3}>Creation Date:</Title>
-                <Text>{image["creation-time"]}</Text>
-              </Box>
-              <Box>
-                <ScrollArea h={250}>
-                  <Stack>
-                    {params}
-                  </Stack>
-                </ScrollArea>
-              </Box>
-            </Stack>
-          </Grid.Col>
-        </Grid>
-      </Modal>
-    )
-  }
+  const detailedImages = images.map((image) => (
+    <Carousel.Slide key={image.id}>
+      <ImageDetail url={getURL(image.id)} image={image}/>
+    </Carousel.Slide>
+  ))
+
+  const [embla, setEmbla] = useState<Embla | null>(null);
+  useAnimationOffsetEffect(embla, TRANSITION_DURATION);
 
   return (
     <AppShell padding="md" header={header} footer={footer}>
-      {modal}
+      <Modal opened={selectedImage !== null} onClose={() => setSelectedImage(null)} fullScreen
+             transitionProps={{duration: TRANSITION_DURATION}}>
+        <Carousel initialSlide={selectedImage || undefined} draggable={false} getEmblaApi={setEmbla}>
+          {detailedImages}
+        </Carousel>
+      </Modal>
       <Grid justify="flex-start">
         {imageList}
       </Grid>
