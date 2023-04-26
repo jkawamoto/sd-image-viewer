@@ -15,7 +15,7 @@ import {
   Stack,
   Text,
   Title,
-  UnstyledButton
+  UnstyledButton, SegmentedControl
 } from "@mantine/core";
 import Query from "./Query.tsx";
 
@@ -30,26 +30,41 @@ function App() {
   const [metadata, setMetadata] = useState<Metadata | null>(null)
   const [page, setPage] = useState(1)
   const [query, setQuery] = useState("")
+  const [size, setSize] = useState("")
 
   const api = new Api()
   const getURL = (id: string) => `${api.baseUrl}/${encodeURIComponent(id)}`
 
   useEffect(() => {
     const fetchImages = async () => {
-      const res = await api.getImages({query, page: page - 1})
+      const res = await api.getImages({
+        query,
+        page: page - 1,
+        size: size === "small" || size === "medium" || size === "large" ? size : undefined,
+      })
       if (res.data.items) {
         setImages(res.data.items)
       }
       setMetadata(res.data.metadata || null)
     }
     fetchImages().catch(console.error)
-  }, [page, query])
+  }, [page, query, size])
 
   const header = (
     <Header height={{base: 50, md: 70}} p="md" fixed>
       <Flex justify="space-between">
         <Text>SD Image Viewer</Text>
         <Query onSearch={setQuery}/>
+        <SegmentedControl
+          value={size}
+          onChange={setSize}
+          data={[
+            {label: 'All', value: ''},
+            {label: 'Small', value: 'small'},
+            {label: 'Medium', value: 'medium'},
+            {label: 'Large', value: 'large'},
+          ]}
+        />
       </Flex>
     </Header>
   )
