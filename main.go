@@ -4,17 +4,26 @@ import (
 	"context"
 	"flag"
 	"log"
+	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/jkawamoto/sd-image-viewer/server"
 )
 
+const AppName = "sd-image-viewer"
+
 func main() {
 	logger := log.Default()
 	bleve.SetLog(logger)
 
-	indexPath := flag.String("index", ".bleve", "path to the index")
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		logger.Printf("failed to get the cache directory: %v", err)
+	}
+
+	indexPath := flag.String("index", filepath.Join(cacheDir, AppName), "path to the index")
 	force := flag.Bool("force", false, "force reindexing all images")
 
 	flag.Parse()
@@ -23,9 +32,13 @@ func main() {
 	}
 	dir := flag.Arg(0)
 
-	index, err := newIndex(*indexPath)
+	index, created, err := newIndex(*indexPath)
 	if err != nil {
 		logger.Fatalf("failed to create an index: %v", err)
+	}
+	if created {
+		// if a new index is created, force reindexing all images.
+		*force = true
 	}
 
 	var wg sync.WaitGroup

@@ -18,19 +18,20 @@ const (
 	posFile   = ".pos"
 )
 
-func newIndex(name string) (bleve.Index, error) {
+func newIndex(name string) (_ bleve.Index, created bool, err error) {
 	index, err := bleve.Open(name)
 	if errors.Is(err, bleve.ErrorIndexPathDoesNotExist) {
 		indexMapping := bleve.NewIndexMapping()
 		indexMapping.AddDocumentMapping(image.DocType, image.DocumentMapping())
 
 		index, err = bleve.New(name, indexMapping)
+		created = true
 	}
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
-	return index, nil
+	return index, created, nil
 }
 
 func indexDir(ctx context.Context, dir string, index bleve.Index, force bool, logger *log.Logger) (err error) {
