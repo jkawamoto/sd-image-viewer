@@ -182,7 +182,7 @@ func GetImagesHandler(index bleve.Index, pathPrefix string, logger *log.Logger) 
 			req.SortBy([]string{"-creation-time"})
 		}
 
-		res, err := index.Search(req)
+		res, err := index.SearchInContext(params.HTTPRequest.Context(), req)
 		if err != nil {
 			logger.Printf("failed to search images: %v", err)
 			return operations.NewGetImagesDefault(http.StatusInternalServerError).WithPayload(&models.StandardError{
