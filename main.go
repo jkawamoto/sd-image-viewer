@@ -43,6 +43,12 @@ func main() {
 		// if a new index is created, force reindexing all images.
 		*force = true
 	}
+	defer func() {
+		logger.Printf("Closing the index")
+		if err = index.Close(); err != nil {
+			logger.Printf("failed to close the index: %v", err)
+		}
+	}()
 
 	var wg sync.WaitGroup
 	defer wg.Wait()

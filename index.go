@@ -18,6 +18,8 @@ import (
 const (
 	targetExt = ".png"
 	posFile   = ".pos"
+
+	maxBatchSize = 100
 )
 
 func newIndex(name string) (_ bleve.Index, created bool, err error) {
@@ -55,7 +57,8 @@ func indexDir(ctx context.Context, dir string, index bleve.Index, force bool, lo
 		}
 	}()
 
-	return filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+	b := index.NewBatch()
+	err = filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if ctx.Err() != nil {
 			return ctx.Err()
 		}
@@ -85,13 +88,27 @@ func indexDir(ctx context.Context, dir string, index bleve.Index, force bool, lo
 		}
 
 		logger.Printf("indexing %v", path)
-		err = index.Index(path, img)
+		err = b.Index(path, img)
 		if err != nil {
-			logger.Printf("failed to index an image: %v", err)
+			return fmt.Errorf("failed to index an image: %w", err)
+		}
+
+		if b.Size() == maxBatchSize {
+			if err = index.Batch(b); err != nil {
+				return fmt.Errorf("failed to index items: %w", err)
+			}
+			b.Reset()
 		}
 
 		return nil
 	})
+	if err != nil {
+		return err
+	}
+	if b.Size() != 0 {
+		return index.Batch(b)
+	}
+	return nil
 }
 
 func pruneIndex(ctx context.Context, index bleve.Index, logger *log.Logger) error {
