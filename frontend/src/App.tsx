@@ -55,6 +55,9 @@ function App() {
         setImages(res.data.items)
       }
       setMetadata(res.data.metadata || null)
+      if (res.data.metadata?.totalPages && page > res.data.metadata?.totalPages) {
+        setPage(res.data.metadata?.totalPages)
+      }
     }
     fetchImages().catch(console.error)
   }, [page, query, size, order, date, thumbSize])
@@ -117,7 +120,7 @@ function App() {
   const footer = (
     <Footer height={{base: 30, md: 50}} fixed>
       <Center mt="0.5em">
-        <Pagination total={metadata?.totalPages || 0} onChange={setPage}/>
+        <Pagination value={page} total={metadata?.totalPages || 0} onChange={setPage}/>
       </Center>
     </Footer>
   )
