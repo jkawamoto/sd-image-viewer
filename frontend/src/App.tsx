@@ -22,6 +22,12 @@ import {useInputState} from "@mantine/hooks";
 
 const TRANSITION_DURATION = 200;
 
+const cfg: ApiConfig = {}
+if (import.meta.env.PROD) {
+  cfg.baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api/v1`
+}
+const api = new Api(cfg)
+
 function App() {
   const [images, setImages] = useState<ImageInfo[]>([])
   const [selectedImage, setSelectedImage] = useState<number | null>(null)
@@ -35,11 +41,6 @@ function App() {
   const [checkpoint, setCheckpoint] = useInputState<string | null>(null)
   const [checkpoints, setCheckpoints] = useState<string[]>([])
 
-  const cfg: ApiConfig = {}
-  if (import.meta.env.PROD) {
-    cfg.baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api/v1`
-  }
-  const api = new Api(cfg)
   const getURL = (id: string) => `${api.baseUrl}/image/${encodeURIComponent(id)}`
 
   useEffect(() => {

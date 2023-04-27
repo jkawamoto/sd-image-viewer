@@ -12,6 +12,7 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/search/query"
+
 	"github.com/jkawamoto/sd-image-viewer/image"
 )
 

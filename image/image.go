@@ -120,7 +120,7 @@ func Parse(r io.ReadSeeker) (*Image, error) {
 	return res, nil
 }
 
-var parametersRegexp = regexp.MustCompile("(.*?)(?:Negative prompt: (.+))?Steps: (\\d+), ")
+var parametersRegexp = regexp.MustCompile(`(.*?)(?:Negative prompt: (.+))?Steps: (\d+), `)
 
 func parseParameters(text string) (map[string]string, error) {
 	text = strings.ReplaceAll(text, "\n", " ")
