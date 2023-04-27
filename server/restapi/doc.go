@@ -6,7 +6,7 @@
 //	  http
 //	Host: localhost:8080
 //	BasePath: /api/v1
-//	Version: 2023-04-23
+//	Version: 2023-04-27
 //
 //	Consumes:
 //	  - application/json

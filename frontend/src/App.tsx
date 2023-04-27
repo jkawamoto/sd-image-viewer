@@ -7,7 +7,7 @@ import {
   Grid,
   Header,
   Image,
-  Modal,
+  Modal, NativeSelect,
   Pagination,
   SegmentedControl,
   Slider,
@@ -18,6 +18,7 @@ import ImageDetail from "./ImageDetail.tsx";
 import {Carousel, Embla, useAnimationOffsetEffect} from "@mantine/carousel";
 import {DatePickerInput} from '@mantine/dates';
 import dayjs from "dayjs";
+import {useInputState} from "@mantine/hooks";
 
 const TRANSITION_DURATION = 200;
 
@@ -31,21 +32,24 @@ function App() {
   const [order, setOrder] = useState("desc")
   const [date, setDate] = useState<Date | null>(null);
   const [thumbSize, setThumbSize] = useState(2)
+  const [checkpoint, setCheckpoint] = useInputState<string | null>(null)
+  const [checkpoints, setCheckpoints] = useState<string[]>([])
 
   const cfg: ApiConfig = {}
   if (import.meta.env.PROD) {
     cfg.baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api/v1`
   }
   const api = new Api(cfg)
-  const getURL = (id: string) => `${api.baseUrl}/${encodeURIComponent(id)}`
+  const getURL = (id: string) => `${api.baseUrl}/image/${encodeURIComponent(id)}`
 
   useEffect(() => {
     const fetchImages = async () => {
       const d = dayjs(date).startOf("day")
-      const res = await api.getImages({
+      const res = await api.images.getImages({
         query,
         page: page - 1,
         size: size === "small" || size === "medium" || size === "large" ? size : undefined,
+        checkpoint: checkpoint || undefined,
         order: order === "asc" ? order : "desc",
         after: d.toJSON() || undefined,
         before: d.day(d.day() + 1).toJSON() || undefined,
@@ -60,7 +64,15 @@ function App() {
       }
     }
     fetchImages().catch(console.error)
-  }, [page, query, size, order, date, thumbSize])
+  }, [page, query, size, checkpoint, order, date, thumbSize])
+
+  useEffect(() => {
+    const fetchCheckpoints = async () => {
+      const res = await api.checkpoints.getCheckpoints()
+      setCheckpoints(res.data)
+    }
+    fetchCheckpoints().catch(console.error)
+  }, [])
 
   const header = (
     <Header height={{base: 50, md: 70}} p="md" fixed>
@@ -93,6 +105,12 @@ function App() {
         </Grid.Col>
         <Grid.Col span="auto">
           <Query onSearch={setQuery}/>
+        </Grid.Col>
+        <Grid.Col span="content">
+          <NativeSelect
+            data={["", ...checkpoints]}
+            onChange={setCheckpoint}
+          />
         </Grid.Col>
         <Grid.Col span="content">
           <DatePickerInput

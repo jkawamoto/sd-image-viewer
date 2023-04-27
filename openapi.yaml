@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   title: SD Image Viewer API
-  version: 2023-04-23
+  version: 2023-04-27
 host: localhost:8080
 basePath: /api/v1
 schemes:
@@ -11,7 +11,7 @@ consumes:
 produces:
   - application/json
 paths:
-  /:
+  /images:
     get:
       operationId: getImages
       description: List images.
@@ -28,6 +28,10 @@ paths:
             - large
           in: query
           description: Retrieving the given sized images.
+        - name: checkpoint
+          type: string
+          in: query
+          description: Retrieving images that use the given checkpoint.
         - name: before
           type: string
           format: date-time
@@ -62,7 +66,7 @@ paths:
           description: Error Response
           schema:
             $ref: "#/definitions/StandardError"
-  /{id}:
+  /image/{id}:
     get:
       operationId: getImage
       description: Get an image.
@@ -94,7 +98,21 @@ paths:
           description: Error Response
           schema:
             $ref: "#/definitions/StandardError"
-
+  /checkpoints:
+    get:
+      operationId: getCheckpoints
+      description: Get a list of checkpoints.
+      responses:
+        200:
+          description: A list of checkpoint names.
+          schema:
+            type: array
+            items:
+              type: string
+        default:
+          description: Error Response
+          schema:
+            $ref: "#/definitions/StandardError"
 definitions:
   ImageList:
     properties:

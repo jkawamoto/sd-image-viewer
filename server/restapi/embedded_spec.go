@@ -30,12 +30,84 @@ func init() {
   "swagger": "2.0",
   "info": {
     "title": "SD Image Viewer API",
-    "version": "2023-04-23"
+    "version": "2023-04-27"
   },
   "host": "localhost:8080",
   "basePath": "/api/v1",
   "paths": {
-    "/": {
+    "/checkpoints": {
+      "get": {
+        "description": "Get a list of checkpoints.",
+        "operationId": "getCheckpoints",
+        "responses": {
+          "200": {
+            "description": "A list of checkpoint names.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "default": {
+            "description": "Error Response",
+            "schema": {
+              "$ref": "#/definitions/StandardError"
+            }
+          }
+        }
+      }
+    },
+    "/image/{id}": {
+      "get": {
+        "description": "Get an image.",
+        "produces": [
+          "image/png",
+          "application/json"
+        ],
+        "operationId": "getImage",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "ID of the image file.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "If-Modified-Since",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Requested image file.",
+            "schema": {
+              "type": "file"
+            },
+            "headers": {
+              "Cache-Control": {
+                "type": "string"
+              },
+              "Last-Modified": {
+                "type": "string"
+              }
+            }
+          },
+          "304": {
+            "description": "Requested image is not modified."
+          },
+          "default": {
+            "description": "Error Response",
+            "schema": {
+              "$ref": "#/definitions/StandardError"
+            }
+          }
+        }
+      }
+    },
+    "/images": {
       "get": {
         "description": "List images.",
         "operationId": "getImages",
@@ -55,6 +127,12 @@ func init() {
             "type": "string",
             "description": "Retrieving the given sized images.",
             "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Retrieving images that use the given checkpoint.",
+            "name": "checkpoint",
             "in": "query"
           },
           {
@@ -100,55 +178,6 @@ func init() {
             "schema": {
               "$ref": "#/definitions/ImageList"
             }
-          },
-          "default": {
-            "description": "Error Response",
-            "schema": {
-              "$ref": "#/definitions/StandardError"
-            }
-          }
-        }
-      }
-    },
-    "/{id}": {
-      "get": {
-        "description": "Get an image.",
-        "produces": [
-          "image/png",
-          "application/json"
-        ],
-        "operationId": "getImage",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "ID of the image file.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "name": "If-Modified-Since",
-            "in": "header"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Requested image file.",
-            "schema": {
-              "type": "file"
-            },
-            "headers": {
-              "Cache-Control": {
-                "type": "string"
-              },
-              "Last-Modified": {
-                "type": "string"
-              }
-            }
-          },
-          "304": {
-            "description": "Requested image is not modified."
           },
           "default": {
             "description": "Error Response",
@@ -253,12 +282,84 @@ func init() {
   "swagger": "2.0",
   "info": {
     "title": "SD Image Viewer API",
-    "version": "2023-04-23"
+    "version": "2023-04-27"
   },
   "host": "localhost:8080",
   "basePath": "/api/v1",
   "paths": {
-    "/": {
+    "/checkpoints": {
+      "get": {
+        "description": "Get a list of checkpoints.",
+        "operationId": "getCheckpoints",
+        "responses": {
+          "200": {
+            "description": "A list of checkpoint names.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "default": {
+            "description": "Error Response",
+            "schema": {
+              "$ref": "#/definitions/StandardError"
+            }
+          }
+        }
+      }
+    },
+    "/image/{id}": {
+      "get": {
+        "description": "Get an image.",
+        "produces": [
+          "application/json",
+          "image/png"
+        ],
+        "operationId": "getImage",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "ID of the image file.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "If-Modified-Since",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Requested image file.",
+            "schema": {
+              "type": "file"
+            },
+            "headers": {
+              "Cache-Control": {
+                "type": "string"
+              },
+              "Last-Modified": {
+                "type": "string"
+              }
+            }
+          },
+          "304": {
+            "description": "Requested image is not modified."
+          },
+          "default": {
+            "description": "Error Response",
+            "schema": {
+              "$ref": "#/definitions/StandardError"
+            }
+          }
+        }
+      }
+    },
+    "/images": {
       "get": {
         "description": "List images.",
         "operationId": "getImages",
@@ -278,6 +379,12 @@ func init() {
             "type": "string",
             "description": "Retrieving the given sized images.",
             "name": "size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Retrieving images that use the given checkpoint.",
+            "name": "checkpoint",
             "in": "query"
           },
           {
@@ -323,55 +430,6 @@ func init() {
             "schema": {
               "$ref": "#/definitions/ImageList"
             }
-          },
-          "default": {
-            "description": "Error Response",
-            "schema": {
-              "$ref": "#/definitions/StandardError"
-            }
-          }
-        }
-      }
-    },
-    "/{id}": {
-      "get": {
-        "description": "Get an image.",
-        "produces": [
-          "application/json",
-          "image/png"
-        ],
-        "operationId": "getImage",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "ID of the image file.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          },
-          {
-            "type": "string",
-            "name": "If-Modified-Since",
-            "in": "header"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Requested image file.",
-            "schema": {
-              "type": "file"
-            },
-            "headers": {
-              "Cache-Control": {
-                "type": "string"
-              },
-              "Last-Modified": {
-                "type": "string"
-              }
-            }
-          },
-          "304": {
-            "description": "Requested image is not modified."
           },
           "default": {
             "description": "Error Response",

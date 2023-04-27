@@ -43,6 +43,9 @@ func NewSdImageViewerAPI(spec *loads.Document) *SdImageViewerAPI {
 		BinProducer:  runtime.ByteStreamProducer(),
 		JSONProducer: runtime.JSONProducer(),
 
+		GetCheckpointsHandler: GetCheckpointsHandlerFunc(func(params GetCheckpointsParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetCheckpoints has not yet been implemented")
+		}),
 		GetImageHandler: GetImageHandlerFunc(func(params GetImageParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetImage has not yet been implemented")
 		}),
@@ -88,6 +91,8 @@ type SdImageViewerAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// GetCheckpointsHandler sets the operation handler for the get checkpoints operation
+	GetCheckpointsHandler GetCheckpointsHandler
 	// GetImageHandler sets the operation handler for the get image operation
 	GetImageHandler GetImageHandler
 	// GetImagesHandler sets the operation handler for the get images operation
@@ -172,6 +177,9 @@ func (o *SdImageViewerAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.GetCheckpointsHandler == nil {
+		unregistered = append(unregistered, "GetCheckpointsHandler")
+	}
 	if o.GetImageHandler == nil {
 		unregistered = append(unregistered, "GetImageHandler")
 	}
@@ -271,11 +279,15 @@ func (o *SdImageViewerAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/{id}"] = NewGetImage(o.context, o.GetImageHandler)
+	o.handlers["GET"]["/checkpoints"] = NewGetCheckpoints(o.context, o.GetCheckpointsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"][""] = NewGetImages(o.context, o.GetImagesHandler)
+	o.handlers["GET"]["/image/{id}"] = NewGetImage(o.context, o.GetImageHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/images"] = NewGetImages(o.context, o.GetImagesHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

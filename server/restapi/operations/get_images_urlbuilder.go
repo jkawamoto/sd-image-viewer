@@ -16,13 +16,14 @@ import (
 
 // GetImagesURL generates an URL for the get images operation
 type GetImagesURL struct {
-	After  *strfmt.DateTime
-	Before *strfmt.DateTime
-	Limit  *int64
-	Order  *string
-	Page   *int64
-	Query  *string
-	Size   *string
+	After      *strfmt.DateTime
+	Before     *strfmt.DateTime
+	Checkpoint *string
+	Limit      *int64
+	Order      *string
+	Page       *int64
+	Query      *string
+	Size       *string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -48,7 +49,7 @@ func (o *GetImagesURL) SetBasePath(bp string) {
 func (o *GetImagesURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/"
+	var _path = "/images"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -72,6 +73,14 @@ func (o *GetImagesURL) Build() (*url.URL, error) {
 	}
 	if beforeQ != "" {
 		qs.Set("before", beforeQ)
+	}
+
+	var checkpointQ string
+	if o.Checkpoint != nil {
+		checkpointQ = *o.Checkpoint
+	}
+	if checkpointQ != "" {
+		qs.Set("checkpoint", checkpointQ)
 	}
 
 	var limitQ string

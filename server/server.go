@@ -30,6 +30,8 @@ var gmt = time.FixedZone("GMT", 0)
 func NewServer(
 	host string, port int, index bleve.Index, pathPrefix string, logger *log.Logger,
 ) (*restapi.Server, error) {
+	query.SetLog(logger)
+
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
 		return nil, err
@@ -38,6 +40,7 @@ func NewServer(
 	api := operations.NewSdImageViewerAPI(swaggerSpec)
 	api.GetImageHandler = GetImageHandler(pathPrefix, logger)
 	api.GetImagesHandler = GetImagesHandler(index, pathPrefix, logger)
+	api.GetCheckpointsHandler = GetCheckpointsHandler(index, logger)
 	api.Logger = logger.Printf
 
 	server := restapi.NewServer(api)
@@ -126,7 +129,6 @@ func GetImageHandler(pathPrefix string, logger *log.Logger) operations.GetImageH
 }
 
 func GetImagesHandler(index bleve.Index, pathPrefix string, logger *log.Logger) operations.GetImagesHandlerFunc {
-	query.SetLog(logger)
 	return func(params operations.GetImagesParams) middleware.Responder {
 		var queries []query.Query
 		if params.Query != nil {
@@ -149,6 +151,12 @@ func GetImagesHandler(index bleve.Index, pathPrefix string, logger *log.Logger) 
 			}
 			q := query.NewNumericRangeInclusiveQuery(min, max, swag.Bool(false), swag.Bool(true))
 			q.FieldVal = "pixel"
+			queries = append(queries, q)
+		}
+		if params.Checkpoint != nil {
+			q := query.NewTermQuery(swag.StringValue(params.Checkpoint))
+			q.FieldVal = "checkpoint"
+
 			queries = append(queries, q)
 		}
 		if params.After != nil || params.Before != nil {
@@ -247,6 +255,40 @@ func getMap(m map[string]any, key string) map[string]any {
 		}
 	}
 	return res
+}
+
+func GetCheckpointsHandler(index bleve.Index, logger *log.Logger) operations.GetCheckpointsHandlerFunc {
+	return func(params operations.GetCheckpointsParams) middleware.Responder {
+		fields, err := index.FieldDict("checkpoint")
+		if err != nil {
+			return operations.NewGetCheckpointsDefault(http.StatusInternalServerError).
+				WithPayload(&models.StandardError{
+					Message: swag.String(err.Error()),
+				})
+		}
+		defer func() {
+			if err = fields.Close(); err != nil {
+				logger.Printf("failed to close a field dict: %v", err)
+			}
+		}()
+
+		var names []string
+		for {
+			f, err := fields.Next()
+			if err != nil {
+				return operations.NewGetCheckpointsDefault(http.StatusInternalServerError).
+					WithPayload(&models.StandardError{
+						Message: swag.String(err.Error()),
+					})
+			} else if f == nil {
+				break
+			}
+
+			names = append(names, f.Term)
+		}
+
+		return operations.NewGetCheckpointsOK().WithPayload(names)
+	}
 }
 
 type responseWriter struct {

@@ -30,7 +30,7 @@ func NewGetImages(ctx *middleware.Context, handler GetImagesHandler) *GetImages 
 }
 
 /*
-	GetImages swagger:route GET / getImages
+	GetImages swagger:route GET /images getImages
 
 List images.
 */

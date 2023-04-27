@@ -9,22 +9,17 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
-	"strings"
 )
 
-// GetImageURL generates an URL for the get image operation
-type GetImageURL struct {
-	ID string
-
+// GetCheckpointsURL generates an URL for the get checkpoints operation
+type GetCheckpointsURL struct {
 	_basePath string
-	// avoid unkeyed usage
-	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetImageURL) WithBasePath(bp string) *GetImageURL {
+func (o *GetCheckpointsURL) WithBasePath(bp string) *GetCheckpointsURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -32,22 +27,15 @@ func (o *GetImageURL) WithBasePath(bp string) *GetImageURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetImageURL) SetBasePath(bp string) {
+func (o *GetCheckpointsURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *GetImageURL) Build() (*url.URL, error) {
+func (o *GetCheckpointsURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/image/{id}"
-
-	id := o.ID
-	if id != "" {
-		_path = strings.Replace(_path, "{id}", id, -1)
-	} else {
-		return nil, errors.New("id is required on GetImageURL")
-	}
+	var _path = "/checkpoints"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -59,7 +47,7 @@ func (o *GetImageURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *GetImageURL) Must(u *url.URL, err error) *url.URL {
+func (o *GetCheckpointsURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -70,17 +58,17 @@ func (o *GetImageURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *GetImageURL) String() string {
+func (o *GetCheckpointsURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *GetImageURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *GetCheckpointsURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on GetImageURL")
+		return nil, errors.New("scheme is required for a full url on GetCheckpointsURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on GetImageURL")
+		return nil, errors.New("host is required for a full url on GetCheckpointsURL")
 	}
 
 	base, err := o.Build()
@@ -94,6 +82,6 @@ func (o *GetImageURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *GetImageURL) StringFull(scheme, host string) string {
+func (o *GetCheckpointsURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

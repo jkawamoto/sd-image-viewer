@@ -48,6 +48,10 @@ type GetImagesParams struct {
 	  In: query
 	*/
 	Before *strfmt.DateTime
+	/*Retrieving images that use the given checkpoint.
+	  In: query
+	*/
+	Checkpoint *string
 	/*The number of items one page has at most.
 	  In: query
 	*/
@@ -89,6 +93,11 @@ func (o *GetImagesParams) BindRequest(r *http.Request, route *middleware.Matched
 
 	qBefore, qhkBefore, _ := qs.GetOK("before")
 	if err := o.bindBefore(qBefore, qhkBefore, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qCheckpoint, qhkCheckpoint, _ := qs.GetOK("checkpoint")
+	if err := o.bindCheckpoint(qCheckpoint, qhkCheckpoint, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -193,6 +202,24 @@ func (o *GetImagesParams) validateBefore(formats strfmt.Registry) error {
 	if err := validate.FormatOf("before", "query", "date-time", o.Before.String(), formats); err != nil {
 		return err
 	}
+	return nil
+}
+
+// bindCheckpoint binds and validates parameter Checkpoint from query.
+func (o *GetImagesParams) bindCheckpoint(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+	o.Checkpoint = &raw
+
 	return nil
 }
 

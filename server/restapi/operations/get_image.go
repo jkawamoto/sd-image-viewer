@@ -30,7 +30,7 @@ func NewGetImage(ctx *middleware.Context, handler GetImageHandler) *GetImage {
 }
 
 /*
-	GetImage swagger:route GET /{id} getImage
+	GetImage swagger:route GET /image/{id} getImage
 
 Get an image.
 */

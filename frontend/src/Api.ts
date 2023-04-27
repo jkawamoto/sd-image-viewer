@@ -266,55 +266,73 @@ export class HttpClient<SecurityDataType = unknown> {
  * @baseUrl http://localhost:8080/api/v1
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  /**
-   * @description List images.
-   *
-   * @name GetImages
-   * @request GET:/
-   */
-  getImages = (
-    query?: {
-      /** Search query. */
-      query?: string;
-      /** Retrieving the given sized images. */
-      size?: "small" | "medium" | "large";
-      /**
-       * Retrieving images created before the given date time.
-       * @format date-time
-       */
-      before?: string;
-      /**
-       * Retrieving images created after the given date time.
-       * @format date-time
-       */
-      after?: string;
-      /** The number of items one page has at most. */
-      limit?: number;
-      /** Requesting page number. */
-      page?: number;
-      /** @default "desc" */
-      order?: "asc" | "desc";
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ImageList, StandardError>({
-      path: `/`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  id = {
+  images = {
+    /**
+     * @description List images.
+     *
+     * @name GetImages
+     * @request GET:/images
+     */
+    getImages: (
+      query?: {
+        /** Search query. */
+        query?: string;
+        /** Retrieving the given sized images. */
+        size?: "small" | "medium" | "large";
+        /** Retrieving images that use the given checkpoint. */
+        checkpoint?: string;
+        /**
+         * Retrieving images created before the given date time.
+         * @format date-time
+         */
+        before?: string;
+        /**
+         * Retrieving images created after the given date time.
+         * @format date-time
+         */
+        after?: string;
+        /** The number of items one page has at most. */
+        limit?: number;
+        /** Requesting page number. */
+        page?: number;
+        /** @default "desc" */
+        order?: "asc" | "desc";
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ImageList, StandardError>({
+        path: `/images`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+  };
+  image = {
     /**
      * @description Get an image.
      *
      * @name GetImage
-     * @request GET:/{id}
+     * @request GET:/image/{id}
      */
     getImage: (id: string, params: RequestParams = {}) =>
       this.request<File, void | StandardError>({
-        path: `/${id}`,
+        path: `/image/${id}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+  checkpoints = {
+    /**
+     * @description Get a list of checkpoints.
+     *
+     * @name GetCheckpoints
+     * @request GET:/checkpoints
+     */
+    getCheckpoints: (params: RequestParams = {}) =>
+      this.request<string[], StandardError>({
+        path: `/checkpoints`,
         method: "GET",
         format: "json",
         ...params,

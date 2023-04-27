@@ -167,8 +167,7 @@ func DocumentMapping() *mapping.DocumentMapping {
 	textFieldMapping := bleve.NewTextFieldMapping()
 	textFieldMapping.Analyzer = standard.Name
 
-	keywordFieldMapping := bleve.NewTextFieldMapping()
-	keywordFieldMapping.Analyzer = simple.Name
+	keywordFieldMapping := bleve.NewKeywordFieldMapping()
 
 	intFieldMapping := bleve.NewNumericFieldMapping()
 
