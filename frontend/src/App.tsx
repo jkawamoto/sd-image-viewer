@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {Api, Image as ImageInfo, Metadata} from "./Api.js";
+import {Api, ApiConfig, Image as ImageInfo, Metadata} from "./Api.js";
 import {
   AppShell,
   Center,
@@ -32,7 +32,11 @@ function App() {
   const [date, setDate] = useState<Date | null>(null);
   const [thumbSize, setThumbSize] = useState(2)
 
-  const api = new Api()
+  const cfg: ApiConfig = {}
+  if (import.meta.env.PROD) {
+    cfg.baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api/v1`
+  }
+  const api = new Api(cfg)
   const getURL = (id: string) => `${api.baseUrl}/${encodeURIComponent(id)}`
 
   useEffect(() => {

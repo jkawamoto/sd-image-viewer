@@ -1,7 +1,9 @@
 package server
 
 import (
+	"io"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -14,6 +16,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/jkawamoto/sd-image-viewer/frontend"
 	"github.com/jkawamoto/sd-image-viewer/image"
 	"github.com/jkawamoto/sd-image-viewer/server/models"
 	"github.com/jkawamoto/sd-image-viewer/server/restapi"
@@ -43,8 +46,33 @@ func NewServer(index bleve.Index, pathPrefix string, logger *log.Logger) (*resta
 	server.ConfigureAPI()
 
 	mux := http.NewServeMux()
-	mux.Handle("/", http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		// TODO: returns frontend code.
+	mux.Handle("/", http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		path := req.URL.Path
+		if path == "/" {
+			path = "index.html"
+		}
+
+		f, err := frontend.Contents.Open(filepath.Join("dist", path))
+		if os.IsNotExist(err) {
+			logger.Printf("requested file doesn't exist: %v", err)
+			http.Error(res, err.Error(), http.StatusNotFound)
+			return
+		} else if err != nil {
+			logger.Printf("failed to stat the requested file: %v", err)
+			http.Error(res, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer func() {
+			if err := f.Close(); err != nil {
+				logger.Printf("failed to close a file: %v", err)
+			}
+		}()
+
+		res.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(path)))
+		res.WriteHeader(http.StatusOK)
+		if _, err = io.Copy(res, f); err != nil {
+			logger.Printf("failed to transfer a file: %v", err)
+		}
 	}))
 	mux.Handle("/api/v1/", server.GetHandler())
 
