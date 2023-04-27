@@ -112,7 +112,7 @@ func Parse(r io.ReadSeeker) (*Image, error) {
 		Pixel:          cfg.Height * cfg.Width,
 		Metadata:       params,
 	}
-	delete(res.Metadata, sizeKey)
+	res.Metadata[sizeKey] = fmt.Sprintf("%vx%v", cfg.Width, cfg.Height)
 	delete(res.Metadata, promptKey)
 	delete(res.Metadata, negativePromptKey)
 	delete(res.Metadata, checkpointKey)
