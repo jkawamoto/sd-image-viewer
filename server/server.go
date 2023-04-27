@@ -27,7 +27,9 @@ const defaultLimit = 20
 
 var gmt = time.FixedZone("GMT", 0)
 
-func NewServer(index bleve.Index, pathPrefix string, logger *log.Logger) (*restapi.Server, error) {
+func NewServer(
+	host string, port int, index bleve.Index, pathPrefix string, logger *log.Logger,
+) (*restapi.Server, error) {
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
 		return nil, err
@@ -39,7 +41,8 @@ func NewServer(index bleve.Index, pathPrefix string, logger *log.Logger) (*resta
 	api.Logger = logger.Printf
 
 	server := restapi.NewServer(api)
-	server.Port = 8080
+	server.Host = host
+	server.Port = port
 	server.KeepAlive = 3 * time.Minute
 	server.ReadTimeout = 30 * time.Second
 	server.WriteTimeout = 60 * time.Second

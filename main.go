@@ -25,6 +25,8 @@ func main() {
 		logger.Printf("failed to get the cache directory: %v", err)
 	}
 
+	host := flag.String("host", "localhost", "the IP to listen on")
+	port := flag.Int("port", 0, "the port to listen on for insecure connections, defaults to a random value")
 	indexPath := flag.String("index", filepath.Join(cacheDir, AppName), "path to the index")
 	force := flag.Bool("force", false, "force reindexing all images")
 	prune := flag.Bool("prune", false, "remove non exiting images from the index")
@@ -82,7 +84,7 @@ func main() {
 		}
 	}()
 
-	s, err := server.NewServer(index, dir, logger)
+	s, err := server.NewServer(*host, *port, index, dir, logger)
 	if err != nil {
 		logger.Fatalf("failed to create a server: %v", err)
 	}
