@@ -77,6 +77,7 @@ func main() {
 			} else if err != nil {
 				logger.Printf("failed to index files in %v: %v", dir, err)
 			}
+			*force = false
 			select {
 			case <-ctx.Done():
 				break
