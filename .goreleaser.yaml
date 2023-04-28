@@ -1,5 +1,6 @@
 before:
   hooks:
+    - yarn --cwd ./frontend
     - yarn --cwd ./frontend build
 builds:
   - goos:
