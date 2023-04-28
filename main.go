@@ -25,7 +25,7 @@ func main() {
 
 	cacheDir, err := os.UserCacheDir()
 	if err != nil {
-		logger.Printf("failed to get the cache directory: %v", err)
+		logger.Printf("Failed to get the cache directory: %v", err)
 	}
 
 	host := flag.String("host", "localhost", "the IP to listen on")
@@ -41,13 +41,13 @@ func main() {
 		os.Exit(0)
 	}
 	if flag.NArg() == 0 {
-		logger.Fatalln("one directory path is required")
+		logger.Fatalln("One directory path is required")
 	}
 	dir := flag.Arg(0)
 
 	index, created, err := newIndex(*indexPath)
 	if err != nil {
-		logger.Fatalf("failed to create an index: %v", err)
+		logger.Fatalf("Failed to create an index: %v", err)
 	}
 	if created {
 		// if a new index is created, force reindexing all images.
@@ -56,7 +56,7 @@ func main() {
 	defer func() {
 		logger.Printf("Closing the index")
 		if err = index.Close(); err != nil {
-			logger.Printf("failed to close the index: %v", err)
+			logger.Printf("Failed to close the index: %v", err)
 		}
 	}()
 
@@ -74,7 +74,7 @@ func main() {
 			if errors.Is(err, context.Canceled) {
 				return
 			} else if err != nil {
-				logger.Printf("failed to prune index: %v", err)
+				logger.Printf("Failed to prune index: %v", err)
 			}
 		}
 		for {
@@ -82,7 +82,7 @@ func main() {
 			if errors.Is(err, context.Canceled) {
 				break
 			} else if err != nil {
-				logger.Printf("failed to index files in %v: %v", dir, err)
+				logger.Printf("Failed to index files in %v: %v", dir, err)
 			}
 			*force = false
 			select {
@@ -95,10 +95,10 @@ func main() {
 
 	s, err := server.NewServer(*host, *port, index, dir, logger)
 	if err != nil {
-		logger.Fatalf("failed to create a server: %v", err)
+		logger.Fatalf("Failed to create a server: %v", err)
 	}
 
 	if err = s.Serve(); err != nil {
-		logger.Fatalf("failed to serve: %v", err)
+		logger.Fatalf("Failed to serve: %v", err)
 	}
 }

@@ -74,7 +74,7 @@ func indexDir(ctx context.Context, dir string, index bleve.Index, force bool, lo
 		}
 		info, err := d.Info()
 		if err != nil {
-			logger.Printf("failed to stat an image file: %v", err)
+			logger.Printf("Failed to stat an image file: %v", err)
 			return nil
 		}
 
@@ -84,11 +84,11 @@ func indexDir(ctx context.Context, dir string, index bleve.Index, force bool, lo
 
 		img, err := image.ParseImageFile(path)
 		if err != nil {
-			logger.Printf("failed to parse an image file: %v", err)
+			logger.Printf("Failed to parse an image file: %v", err)
 			return nil
 		}
 
-		logger.Printf("indexing %v", path)
+		logger.Printf("Indexing %v", path)
 		err = b.Index(path, img)
 		if err != nil {
 			return fmt.Errorf("failed to index an image: %w", err)
@@ -116,7 +116,7 @@ func pruneIndex(ctx context.Context, index bleve.Index, logger *log.Logger) erro
 	size := 100
 	from := 0
 
-	logger.Println("pruning index")
+	logger.Println("Pruning index")
 	for {
 		if ctx.Err() != nil {
 			return ctx.Err()
@@ -127,7 +127,7 @@ func pruneIndex(ctx context.Context, index bleve.Index, logger *log.Logger) erro
 			return err
 		}
 		if len(res.Hits) == 0 {
-			logger.Println("finished pruning index")
+			logger.Println("Finished pruning index")
 			return nil
 		}
 		from += size
@@ -136,11 +136,11 @@ func pruneIndex(ctx context.Context, index bleve.Index, logger *log.Logger) erro
 		for _, v := range res.Hits {
 			_, err = os.Stat(v.ID)
 			if os.IsNotExist(err) {
-				logger.Printf("removing %v from index", v.ID)
+				logger.Printf("Removing %v from index", v.ID)
 				b.Delete(v.ID)
 				from--
 			} else if err != nil {
-				logger.Printf("failed to stat a file: %v", err)
+				logger.Printf("Failed to stat a file: %v", err)
 			}
 		}
 		if err = index.Batch(b); err != nil {

@@ -24,7 +24,10 @@ import (
 	"github.com/jkawamoto/sd-image-viewer/server/restapi/operations"
 )
 
-const defaultLimit = 20
+const (
+	defaultLimit = 20
+	cacheMaxAge  = "max-age=604800"
+)
 
 var gmt = time.FixedZone("GMT", 0)
 
@@ -61,24 +64,24 @@ func NewServer(
 
 		f, err := frontend.Contents.Open(filepath.Join("dist", path))
 		if os.IsNotExist(err) {
-			logger.Printf("requested file doesn't exist: %v", err)
+			logger.Printf("Requested file doesn't exist: %v", err)
 			http.Error(res, err.Error(), http.StatusNotFound)
 			return
 		} else if err != nil {
-			logger.Printf("failed to stat the requested file: %v", err)
+			logger.Printf("Failed to stat the requested file: %v", err)
 			http.Error(res, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		defer func() {
 			if err := f.Close(); err != nil {
-				logger.Printf("failed to close a file: %v", err)
+				logger.Printf("Failed to close a file: %v", err)
 			}
 		}()
 
 		res.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(path)))
 		res.WriteHeader(http.StatusOK)
 		if _, err = io.Copy(res, f); err != nil {
-			logger.Printf("failed to transfer a file: %v", err)
+			logger.Printf("Failed to transfer a file: %v", err)
 		}
 	}))
 	mux.Handle("/api/v1/", server.GetHandler())
@@ -94,12 +97,12 @@ func GetImageHandler(pathPrefix string, logger *log.Logger) operations.GetImageH
 
 		info, err := os.Stat(name)
 		if os.IsNotExist(err) {
-			logger.Printf("requested file doesn't exist: %v", err)
+			logger.Printf("Requested file doesn't exist: %v", err)
 			return operations.NewGetImageDefault(http.StatusNotFound).WithPayload(&models.StandardError{
 				Message: swag.String(err.Error()),
 			})
 		} else if err != nil {
-			logger.Printf("failed to stat the requested file: %v", err)
+			logger.Printf("Failed to stat the requested file: %v", err)
 			return operations.NewGetImageDefault(http.StatusInternalServerError).WithPayload(&models.StandardError{
 				Message: swag.String(err.Error()),
 			})
@@ -108,7 +111,7 @@ func GetImageHandler(pathPrefix string, logger *log.Logger) operations.GetImageH
 		if since := swag.StringValue(params.IfModifiedSince); since != "" {
 			t, err := time.Parse(time.RFC1123, since)
 			if err != nil {
-				logger.Printf("failed to parse the given If-Modified-Since header value: %v", err)
+				logger.Printf("Failed to parse the given If-Modified-Since header value: %v", err)
 			} else if !info.ModTime().After(t) {
 				return operations.NewGetImageNotModified()
 			}
@@ -116,7 +119,7 @@ func GetImageHandler(pathPrefix string, logger *log.Logger) operations.GetImageH
 
 		f, err := os.Open(name)
 		if err != nil {
-			logger.Printf("failed to open the requested file: %v", err)
+			logger.Printf("Failed to open the requested file: %v", err)
 			return operations.NewGetImagesDefault(http.StatusInternalServerError).WithPayload(&models.StandardError{
 				Message: swag.String(err.Error()),
 			})
@@ -124,7 +127,7 @@ func GetImageHandler(pathPrefix string, logger *log.Logger) operations.GetImageH
 
 		return operations.NewGetImageOK().
 			WithPayload(f).
-			WithCacheControl("max-age=3600").
+			WithCacheControl(cacheMaxAge).
 			WithLastModified(info.ModTime().In(gmt).Format(time.RFC1123))
 	}
 }
@@ -193,7 +196,7 @@ func GetImagesHandler(index bleve.Index, pathPrefix string, logger *log.Logger) 
 
 		res, err := index.SearchInContext(params.HTTPRequest.Context(), req)
 		if err != nil {
-			logger.Printf("failed to search images: %v", err)
+			logger.Printf("Failed to search images: %v", err)
 			return operations.NewGetImagesDefault(http.StatusInternalServerError).WithPayload(&models.StandardError{
 				Message: swag.String(err.Error()),
 			})
@@ -203,7 +206,7 @@ func GetImagesHandler(index bleve.Index, pathPrefix string, logger *log.Logger) 
 		for i, v := range res.Hits {
 			id, err := filepath.Rel(pathPrefix, v.ID)
 			if err != nil {
-				logger.Printf("failed to get a relative path: %v", err)
+				logger.Printf("Failed to get a relative path: %v", err)
 				return operations.NewGetImagesDefault(http.StatusInternalServerError).WithPayload(&models.StandardError{
 					Message: swag.String(err.Error()),
 				})
@@ -269,7 +272,7 @@ func GetCheckpointsHandler(index bleve.Index, logger *log.Logger) operations.Get
 		}
 		defer func() {
 			if err = fields.Close(); err != nil {
-				logger.Printf("failed to close a field dict: %v", err)
+				logger.Printf("Failed to close a field dict: %v", err)
 			}
 		}()
 
