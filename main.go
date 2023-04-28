@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,6 +17,7 @@ import (
 )
 
 const AppName = "sd-image-viewer"
+const Version = "v0.0.0"
 
 func main() {
 	logger := log.Default()
@@ -31,8 +33,13 @@ func main() {
 	indexPath := flag.String("index", filepath.Join(cacheDir, AppName), "path to the index")
 	force := flag.Bool("force", false, "force reindexing all images")
 	prune := flag.Bool("prune", false, "remove non exiting images from the index")
+	version := flag.Bool("v", false, "prints current version")
 
 	flag.Parse()
+	if *version {
+		fmt.Printf("%v %v\n", AppName, Version)
+		os.Exit(0)
+	}
 	if flag.NArg() == 0 {
 		logger.Fatalln("one directory path is required")
 	}

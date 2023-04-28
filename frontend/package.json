@@ -1,6 +1,5 @@
 {
   "name": "frontend",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -34,5 +33,6 @@
     "swagger-typescript-api": "^12.0.4",
     "typescript": "^5.0.2",
     "vite": "^4.3.0"
-  }
+  },
+  "private": true
 }
