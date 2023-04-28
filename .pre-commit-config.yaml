@@ -1,0 +1,27 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/APIDevTools/swagger-cli
+    rev: v4.0.4
+    hooks:
+      - id: swagger-validation
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.52.2
+    hooks:
+      - id: golangci-lint
+  - repo: https://github.com/eslint/eslint
+    rev: v8.39.0
+    hooks:
+      - id: eslint
+        files: \.[jt]sx?$
+        types:
+          - file
+        args:
+          - --report-unused-disable-directives
+          - --max-warnings
+          - "0"

@@ -1,0 +1,169 @@
+swagger: "2.0"
+info:
+  title: SD Image Viewer API
+  version: "2023-04-27"
+host: localhost:8080
+basePath: /api/v1
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /images:
+    get:
+      operationId: getImages
+      description: List images.
+      parameters:
+        - name: query
+          type: string
+          in: query
+          description: Search query.
+        - name: size
+          type: string
+          enum:
+            - small
+            - medium
+            - large
+          in: query
+          description: Retrieving the given sized images.
+        - name: checkpoint
+          type: string
+          in: query
+          description: Retrieving images that use the given checkpoint.
+        - name: before
+          type: string
+          format: date-time
+          in: query
+          description: Retrieving images created before the given date time.
+        - name: after
+          type: string
+          format: date-time
+          in: query
+          description: Retrieving images created after the given date time.
+        - name: limit
+          type: integer
+          in: query
+          description: The number of items one page has at most.
+        - name: page
+          type: integer
+          in: query
+          description: Requesting page number.
+        - name: order
+          type: string
+          enum:
+            - asc
+            - desc
+          in: query
+          default: desc
+      responses:
+        200:
+          description: A list of images.
+          schema:
+            $ref: "#/definitions/ImageList"
+        default:
+          description: Error Response
+          schema:
+            $ref: "#/definitions/StandardError"
+  /image/{id}:
+    get:
+      operationId: getImage
+      description: Get an image.
+      parameters:
+        - name: id
+          type: string
+          in: path
+          required: true
+          description: ID of the image file.
+        - name: If-Modified-Since
+          type: string
+          in: header
+      produces:
+        - image/png
+        - application/json
+      responses:
+        200:
+          description: Requested image file.
+          schema:
+            type: file
+          headers:
+            Cache-Control:
+              type: string
+            Last-Modified:
+              type: string
+        304:
+          description: Requested image is not modified.
+        default:
+          description: Error Response
+          schema:
+            $ref: "#/definitions/StandardError"
+  /checkpoints:
+    get:
+      operationId: getCheckpoints
+      description: Get a list of checkpoints.
+      responses:
+        200:
+          description: A list of checkpoint names.
+          schema:
+            type: array
+            items:
+              type: string
+        default:
+          description: Error Response
+          schema:
+            $ref: "#/definitions/StandardError"
+definitions:
+  ImageList:
+    properties:
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/Image"
+      metadata:
+        $ref: "#/definitions/Metadata"
+  Image:
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        description: ID of the image file.
+      prompt:
+        type: string
+      negative-prompt:
+        type: string
+      checkpoint:
+        type: string
+      pixel:
+        type: integer
+      creation-time:
+        type: string
+        format: date-time
+    additionalProperties: true
+  Metadata:
+    required:
+      - currentPage
+      - totalPages
+      - totalItems
+    properties:
+      currentPage:
+        type: integer
+        description: The the current page you are at.
+        example: 2
+      totalPages:
+        type: integer
+        description: The total number of pages.
+        example: 16
+      totalItems:
+        type: integer
+        format: int
+        description: The total number of items available.
+        example: 46
+  StandardError:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+        description: The error message.
