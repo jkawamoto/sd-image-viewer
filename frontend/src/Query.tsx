@@ -1,3 +1,13 @@
+/*
+ * Query.tsx
+ *
+ * Copyright (c) 2023 Junpei Kawamoto
+ *
+ * This software is released under the MIT License.
+ *
+ * http://opensource.org/licenses/mit-license.php
+ */
+
 import {KeyboardEvent, useCallback} from "react";
 import {TextInput} from "@mantine/core";
 import {useInputState} from "@mantine/hooks";

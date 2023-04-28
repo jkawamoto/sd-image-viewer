@@ -1,3 +1,13 @@
+/*
+ * ImageDetail.tsx
+ *
+ * Copyright (c) 2023 Junpei Kawamoto
+ *
+ * This software is released under the MIT License.
+ *
+ * http://opensource.org/licenses/mit-license.php
+ */
+
 import {Box, Grid, Image, ScrollArea, Stack, Text, Title} from "@mantine/core";
 import {Image as ImageInfo} from "./Api.js";
 import  dayjs from "dayjs";

@@ -1,3 +1,13 @@
+/*
+ * App.tsx
+ *
+ * Copyright (c) 2023 Junpei Kawamoto
+ *
+ * This software is released under the MIT License.
+ *
+ * http://opensource.org/licenses/mit-license.php
+ */
+
 import {useEffect, useState} from 'react'
 import {Api, ApiConfig, Image as ImageInfo, Metadata} from "./Api.js";
 import {

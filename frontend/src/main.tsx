@@ -1,3 +1,13 @@
+/*
+ * main.tsx
+ *
+ * Copyright (c) 2023 Junpei Kawamoto
+ *
+ * This software is released under the MIT License.
+ *
+ * http://opensource.org/licenses/mit-license.php
+ */
+
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
