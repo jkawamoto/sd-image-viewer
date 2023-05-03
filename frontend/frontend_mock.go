@@ -1,6 +1,6 @@
-//go:build !mock
+//go:build mock
 
-// frontend.go
+// frontend_mock.go
 //
 // Copyright (c) 2023 Junpei Kawamoto
 //
@@ -12,5 +12,4 @@ package frontend
 
 import "embed"
 
-//go:embed dist/*
 var Contents embed.FS
