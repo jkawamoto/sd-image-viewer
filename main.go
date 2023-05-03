@@ -25,7 +25,7 @@ import (
 )
 
 const AppName = "sd-image-viewer"
-const Version = "v0.1.0"
+const Version = "v0.1.1"
 
 func main() {
 	logger := log.Default()
