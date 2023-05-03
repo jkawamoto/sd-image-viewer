@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/blevesearch/bleve/v2 v2.3.7
+	github.com/brianvoe/gofakeit/v6 v6.21.0
 	github.com/go-openapi/errors v0.20.3
 	github.com/go-openapi/loads v0.21.2
 	github.com/go-openapi/runtime v0.26.0
