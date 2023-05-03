@@ -128,7 +128,7 @@ func Parse(r io.ReadSeeker) (*Image, error) {
 	return res, nil
 }
 
-var parametersRegexp = regexp.MustCompile(`(.*?)(?:Negative prompt: (.+))?Steps: (\d+), `)
+var parametersRegexp = regexp.MustCompile(`(.*?) (?:Negative prompt: (.+) )?Steps: (\d+), `)
 
 func parseParameters(text string) (map[string]string, error) {
 	text = strings.ReplaceAll(text, "\n", " ")
@@ -147,26 +147,36 @@ func parseParameters(text string) (map[string]string, error) {
 	additionalParameters := text[len(sm[0]):]
 	var (
 		pos    int
+		json   bool
 		quoted bool
 		key    string
 	)
 	for i := 0; i != len(additionalParameters); i++ {
 		switch additionalParameters[i] {
 		case '"':
-			quoted = !quoted
+			if !json {
+				quoted = !quoted
+			}
 		case ':':
-			if !quoted {
+			if !quoted && !json {
 				key = strings.Trim(additionalParameters[pos:i], " ")
 				pos = i + 1
 			}
 		case ',':
-			if !quoted {
+			if !quoted && !json {
 				res[key] = strings.Trim(additionalParameters[pos:i], " ")
 				pos = i + 1
+				key = ""
 			}
+		case '{':
+			json = true
+		case '}':
+			json = false
 		}
 	}
-	res[key] = strings.Trim(additionalParameters[pos:], " ")
+	if key != "" {
+		res[key] = strings.Trim(additionalParameters[pos:], " ")
+	}
 
 	return res, nil
 }
