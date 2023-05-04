@@ -39,6 +39,7 @@ func main() {
 	host := flag.String("host", "localhost", "the IP to listen on")
 	port := flag.Int("port", 0, "the port to listen on for insecure connections, defaults to a random value")
 	indexPath := flag.String("index", filepath.Join(cacheDir, AppName), "path to the index")
+	duration := flag.Duration("index-duration", time.Hour, "duration of indexing")
 	force := flag.Bool("force", false, "force reindexing all images")
 	prune := flag.Bool("prune", false, "remove non exiting images from the index")
 	version := flag.Bool("v", false, "prints current version")
@@ -96,7 +97,7 @@ func main() {
 			select {
 			case <-ctx.Done():
 				break
-			case <-time.After(1 * time.Hour):
+			case <-time.After(*duration):
 			}
 		}
 	}()
