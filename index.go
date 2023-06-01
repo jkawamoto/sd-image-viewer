@@ -25,8 +25,9 @@ import (
 )
 
 const (
-	targetExt = ".png"
-	posFile   = ".pos"
+	pngExt  = ".png"
+	webpExt = ".webp"
+	posFile = ".pos"
 
 	maxBatchSize = 100
 )
@@ -77,7 +78,7 @@ func indexDir(ctx context.Context, dir string, index bleve.Index, force bool, lo
 		if d.IsDir() {
 			return nil
 		}
-		if filepath.Ext(path) != targetExt {
+		if ext := filepath.Ext(path); ext != pngExt && ext != webpExt {
 			return nil
 		}
 		info, err := d.Info()
