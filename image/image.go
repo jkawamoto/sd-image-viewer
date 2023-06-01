@@ -10,19 +10,14 @@ package image
 
 import (
 	"errors"
-	"fmt"
-	"image/png"
-	"io"
 	"os"
-	"regexp"
-	"strings"
+	"path/filepath"
 	"time"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/simple"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/standard"
 	"github.com/blevesearch/bleve/v2/mapping"
-	"github.com/jkawamoto/go-pngtext"
 )
 
 const (
@@ -78,107 +73,24 @@ func ParseImageFile(name string) (_ *Image, err error) {
 		return nil, err
 	}
 
-	img, err := Parse(f)
-	if err != nil {
-		return nil, err
+	var img *Image
+	switch filepath.Ext(name) {
+	case ".png":
+		img, err = ParsePNG(f)
+		if err != nil {
+			return nil, err
+		}
+	case ".webp":
+		img, err = ParseWebP(f)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		return nil, errors.New("filetype not supported")
 	}
 
 	img.CreationTime = info.ModTime()
 	return img, nil
-}
-
-func Parse(r io.ReadSeeker) (*Image, error) {
-	cfg, err := png.DecodeConfig(r)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = r.Seek(0, io.SeekStart)
-	if err != nil {
-		return nil, err
-	}
-
-	list, err := pngtext.ParseTextualData(r)
-	if err != nil {
-		return nil, err
-	}
-
-	data := list.Find("parameters")
-	if data == nil {
-		return nil, errNoParameters
-	}
-
-	params, err := parseParameters(data.Text)
-	if err != nil {
-		return nil, err
-	}
-
-	res := &Image{
-		Prompt:         params[promptKey],
-		NegativePrompt: params[negativePromptKey],
-		Checkpoint:     params[checkpointKey],
-		Pixel:          cfg.Height * cfg.Width,
-		Metadata:       params,
-	}
-	res.Metadata[sizeKey] = fmt.Sprintf("%vx%v", cfg.Width, cfg.Height)
-	delete(res.Metadata, promptKey)
-	delete(res.Metadata, negativePromptKey)
-	delete(res.Metadata, checkpointKey)
-
-	return res, nil
-}
-
-var parametersRegexp = regexp.MustCompile(`(.*?) (?:Negative prompt: (.+) )?Steps: (\d+), `)
-
-func parseParameters(text string) (map[string]string, error) {
-	text = strings.ReplaceAll(text, "\n", " ")
-	m := parametersRegexp.FindAllStringSubmatch(text, -1)
-	if len(m) != 1 {
-		return nil, fmt.Errorf("%w: %v", errNotSupportedParameters, text)
-	}
-
-	res := make(map[string]string)
-
-	sm := m[0]
-	res[promptKey] = sm[1]
-	res[negativePromptKey] = sm[2]
-	res[stepsKey] = sm[3]
-
-	additionalParameters := text[len(sm[0]):]
-	var (
-		pos    int
-		json   bool
-		quoted bool
-		key    string
-	)
-	for i := 0; i != len(additionalParameters); i++ {
-		switch additionalParameters[i] {
-		case '"':
-			if !json {
-				quoted = !quoted
-			}
-		case ':':
-			if !quoted && !json {
-				key = strings.Trim(additionalParameters[pos:i], " ")
-				pos = i + 1
-			}
-		case ',':
-			if !quoted && !json {
-				res[key] = strings.Trim(additionalParameters[pos:i], " ")
-				pos = i + 1
-				key = ""
-			}
-		case '{':
-			json = true
-		case '}':
-			json = false
-		}
-	}
-	if key != "" {
-		res[key] = strings.Trim(additionalParameters[pos:], " ")
-	}
-
-	return res, nil
 }
 
 func DocumentMapping() *mapping.DocumentMapping {
