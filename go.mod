@@ -12,7 +12,7 @@ require (
 	github.com/go-openapi/strfmt v0.21.7
 	github.com/go-openapi/swag v0.22.3
 	github.com/go-openapi/validate v0.22.1
-	github.com/gohugoio/hugo v0.112.5
+	github.com/gohugoio/hugo v0.113.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jkawamoto/go-pngtext v0.1.0
 	golang.org/x/image v0.7.0
