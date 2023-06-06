@@ -11,11 +11,11 @@ repos:
     hooks:
       - id: swagger-validation
   - repo: https://github.com/golangci/golangci-lint
-    rev: v1.52.2
+    rev: v1.53.2
     hooks:
       - id: golangci-lint
   - repo: https://github.com/eslint/eslint
-    rev: v8.39.0
+    rev: v8.42.0
     hooks:
       - id: eslint
         files: \.[jt]sx?$
