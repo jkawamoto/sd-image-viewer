@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-var parametersRegexp = regexp.MustCompile(`(.*?)\s*(?:Negative prompt: (.+) )?Steps: (\d+), `)
+var parametersRegexp = regexp.MustCompile(`(.*?)\s*(?:Negative prompt: (.+?)\s*)?Steps: (\d+), `)
 
 func parseParameters(text string) (map[string]string, error) {
 	text = strings.ReplaceAll(text, "\n", " ")

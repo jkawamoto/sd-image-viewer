@@ -49,7 +49,47 @@ func Test_parseParameters(t *testing.T) {
 		},
 		{
 			text: fmt.Sprintf(
+				"%v.Negative prompt: %v Steps: %v, Model: %v", prompt, negativePrompt, steps, checkpoint),
+			expect: map[string]string{
+				promptKey:         prompt + ".",
+				negativePromptKey: negativePrompt,
+				stepsKey:          fmt.Sprint(steps),
+				checkpointKey:     checkpoint,
+			},
+		},
+		{
+			text: fmt.Sprintf(
 				"%vNegative prompt: %v Steps: %v, Model: %v", prompt, negativePrompt, steps, checkpoint),
+			expect: map[string]string{
+				promptKey:         prompt,
+				negativePromptKey: negativePrompt,
+				stepsKey:          fmt.Sprint(steps),
+				checkpointKey:     checkpoint,
+			},
+		},
+		{
+			text: fmt.Sprintf(
+				"%v Negative prompt: %v,Steps: %v, Model: %v", prompt, negativePrompt, steps, checkpoint),
+			expect: map[string]string{
+				promptKey:         prompt,
+				negativePromptKey: negativePrompt + ",",
+				stepsKey:          fmt.Sprint(steps),
+				checkpointKey:     checkpoint,
+			},
+		},
+		{
+			text: fmt.Sprintf(
+				"%v Negative prompt: %v.Steps: %v, Model: %v", prompt, negativePrompt, steps, checkpoint),
+			expect: map[string]string{
+				promptKey:         prompt,
+				negativePromptKey: negativePrompt + ".",
+				stepsKey:          fmt.Sprint(steps),
+				checkpointKey:     checkpoint,
+			},
+		},
+		{
+			text: fmt.Sprintf(
+				"%v Negative prompt: %vSteps: %v, Model: %v", prompt, negativePrompt, steps, checkpoint),
 			expect: map[string]string{
 				promptKey:         prompt,
 				negativePromptKey: negativePrompt,
