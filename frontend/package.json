@@ -34,7 +34,7 @@
     "npm-check-updates": "^16.13.1",
     "swagger-typescript-api": "^13.0.3",
     "typescript": "^5.2.2",
-    "vite": "^4.4.12"
+    "vite": "^4.5.2"
   },
   "license": "MIT",
   "private": true
