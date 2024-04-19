@@ -16,7 +16,7 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jkawamoto/go-pngtext v0.1.0
 	golang.org/x/image v0.11.0
-	golang.org/x/net v0.17.0
+	golang.org/x/net v0.23.0
 )
 
 require (
@@ -57,7 +57,7 @@ require (
 	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
 	go.mongodb.org/mongo-driver v1.12.1 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
