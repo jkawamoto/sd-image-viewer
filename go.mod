@@ -15,7 +15,7 @@ require (
 	github.com/gohugoio/hugo v0.117.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/jkawamoto/go-pngtext v0.1.0
-	golang.org/x/image v0.11.0
+	golang.org/x/image v0.18.0
 	golang.org/x/net v0.23.0
 )
 
